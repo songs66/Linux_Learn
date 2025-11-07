@@ -1,0 +1,32 @@
+<component name="ProjectDictionaryState">
+  <dictionary name="project">
+    <words>
+      <w>aname</w>
+      <w>clientfd</w>
+      <w>defaultdb</w>
+      <w>epfd</w>
+      <w>epool</w>
+      <w>fdread</w>
+      <w>fopen</w>
+      <w>gethostbyname</w>
+      <w>inaddr</w>
+      <w>islistenfd</w>
+      <w>lmysqlclient</w>
+      <w>lpthread</w>
+      <w>maxevents</w>
+      <w>nready</w>
+      <w>ntoa</w>
+      <w>qclass</w>
+      <w>querys</w>
+      <w>recvfrom</w>
+      <w>rlen</w>
+      <w>servaddr</w>
+      <w>slen</w>
+      <w>sockfd</w>
+      <w>sockfds</w>
+      <w>strdup</w>
+      <w>threadid</w>
+      <w>zihao</w>
+    </words>
+  </dictionary>
+</component>
