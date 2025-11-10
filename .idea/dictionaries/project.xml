@@ -2,6 +2,7 @@
   <dictionary name="project">
     <words>
       <w>aname</w>
+      <w>clientaddr</w>
       <w>clientfd</w>
       <w>defaultdb</w>
       <w>epfd</w>
