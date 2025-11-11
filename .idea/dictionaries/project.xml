@@ -20,12 +20,15 @@
       <w>qclass</w>
       <w>querys</w>
       <w>recvfrom</w>
+      <w>rfds</w>
       <w>rlen</w>
+      <w>rset</w>
       <w>servaddr</w>
       <w>slen</w>
       <w>sockfd</w>
       <w>sockfds</w>
       <w>strdup</w>
+      <w>thid</w>
       <w>threadid</w>
       <w>zihao</w>
     </words>
