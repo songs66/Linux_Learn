@@ -7,6 +7,8 @@
       <w>connfd</w>
       <w>defaultdb</w>
       <w>epfd</w>
+      <w>epollin</w>
+      <w>epollout</w>
       <w>epool</w>
       <w>fdread</w>
       <w>fopen</w>
@@ -20,9 +22,12 @@
       <w>ntoa</w>
       <w>qclass</w>
       <w>querys</w>
+      <w>rbuffer</w>
+      <w>rcallback</w>
       <w>recvfrom</w>
       <w>rfds</w>
       <w>rlen</w>
+      <w>rlength</w>
       <w>rset</w>
       <w>servaddr</w>
       <w>slen</w>
@@ -31,6 +36,7 @@
       <w>strdup</w>
       <w>thid</w>
       <w>threadid</w>
+      <w>wlength</w>
       <w>zihao</w>
     </words>
   </dictionary>
