@@ -11,7 +11,7 @@
 #include <sys/time.h>
 
 #define BUFFER_LENGTH   1024
-#define CONNECTION_SIZE 1024
+#define CONNECTION_SIZE 1048576 //1024*1024
 
 
 //定义了一个函数指针类型RCALLBACK，它指向一个函数，该函数接收一个int类型的参数fd，并返回一个int类型的值
@@ -96,7 +96,8 @@ int recv_cb(int fd) {
         //将第connfd号clientfd关掉
         close(fd);
         //使用EPOLL_CTL_DEL将其删除
-        epoll_ctl(epfd,EPOLL_CTL_DEL,fd,NULL);////unfinish
+        epoll_ctl(epfd,EPOLL_CTL_DEL,fd,NULL);
+        memset(&conn_list[fd],0,sizeof(conn_list[fd]));
         //继续进行下一次循环
         return 0;
     }
