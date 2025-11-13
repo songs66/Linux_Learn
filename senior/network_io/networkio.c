@@ -300,9 +300,7 @@ int main() {
                 printf("successful send %d bytes\n",count);
             }
         }
-
     }
-
 #endif
     getchar();
     printf("exit\n");

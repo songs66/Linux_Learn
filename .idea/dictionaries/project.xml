@@ -4,6 +4,7 @@
       <w>aname</w>
       <w>clientaddr</w>
       <w>clientfd</w>
+      <w>connfd</w>
       <w>defaultdb</w>
       <w>epfd</w>
       <w>epool</w>
