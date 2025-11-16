@@ -9,8 +9,10 @@
       <w>epfd</w>
       <w>epollin</w>
       <w>epollout</w>
+      <w>epollsize</w>
       <w>epool</w>
       <w>fdread</w>
+      <w>filefd</w>
       <w>fopen</w>
       <w>gethostbyname</w>
       <w>inaddr</w>

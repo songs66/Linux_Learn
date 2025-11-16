@@ -11,32 +11,13 @@
 #include <sys/epoll.h>
 #include <sys/time.h>
 
-#define BUFFER_LENGTH   1024
-#define CONNECTION_SIZE 1048576
+#include "server.h"
 
-#define MAX_PORT    100
+#define CONNECTION_SIZE 1024
 
-//定义了一个函数指针类型RCALLBACK，它指向一个函数，该函数接收一个int类型的参数fd，并返回一个int类型的值
-typedef int (*RCALLBACK)(int fd);
-//网络通信的连接结构体conn
-struct conn {
-    int fd;
+#define MAX_PORT    1
 
-    char rbuffer[BUFFER_LENGTH];
-    int rlength;
 
-    char wbuffer[BUFFER_LENGTH];
-    int wlength;
-
-    //可写时的事件
-    RCALLBACK send_callback;
-    //联合体的所有成员共享同一块内存，因此在任何时刻，联合体中只有一个成员的值是有效的
-    union {
-        //可读时的事件
-        RCALLBACK recv_callback;
-        RCALLBACK accept_callback;
-    }r_action;
-};
 
 //定义全局的epfd
 int epfd=0;
@@ -121,12 +102,14 @@ int recv_cb(int fd) {
     }
     conn_list[fd].rlength=count;
 
-    printf("successful recv %d bytes\nRECV:%s\n",conn_list[fd].rlength,conn_list[fd].rbuffer);
+    printf("successful recv %d bytes form clientfd:%d\nRECV:%s\n",conn_list[fd].rlength,fd,conn_list[fd].rbuffer);
 
-#if 1   //echo重复
+#if 0   //echo重复
     conn_list[fd].wlength=conn_list[fd].rlength;
     memset(conn_list[fd].wbuffer,0,BUFFER_LENGTH);
     memcpy(conn_list[fd].wbuffer,conn_list[fd].rbuffer,conn_list[fd].rlength);
+#else
+    http_request(&conn_list[fd]);
 #endif
 
     set_event(fd,EPOLLOUT,0);
@@ -135,6 +118,11 @@ int recv_cb(int fd) {
 }
 
 int send_cb(int fd) {
+
+#if 1
+    http_response(&conn_list[fd]);
+#endif
+
     //发送
     int count=send(fd,conn_list[fd].wbuffer,conn_list[fd].wlength,0);
     printf("successful send %d bytes\n",count);
