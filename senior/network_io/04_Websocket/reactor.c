@@ -10,6 +10,8 @@
 #include <poll.h>
 #include <sys/epoll.h>
 #include <sys/time.h>
+#include <stdint.h>
+#include <arpa/inet.h>
 
 #include "server.h"
 
@@ -71,69 +73,89 @@ int accept_cb(int fd) {
     memset(conn_list[clientfd].wbuffer,0,BUFFER_LENGTH);
     conn_list[clientfd].wlength=0;
 
+    conn_list[clientfd].status=0;
+
     set_event(clientfd,EPOLLIN,1);
 
     return 0;
 }
 
 int recv_cb(int fd) {
-    memset(conn_list[fd].rbuffer,0,BUFFER_LENGTH);
-    int count=recv(fd,conn_list[fd].rbuffer,BUFFER_LENGTH,0);
-    if (count==-1) {
-        printf("recv error:%s\n",strerror(errno));
+    memset(conn_list[fd].rbuffer, 0, BUFFER_LENGTH);
+    int count = recv(fd, conn_list[fd].rbuffer, BUFFER_LENGTH, 0);
 
-        //将第connfd号clientfd关掉
+    if (count == -1) {
+        printf("recv error:%s\n", strerror(errno));
         close(fd);
-        //使用EPOLL_CTL_DEL将其删除
-        epoll_ctl(epfd,EPOLL_CTL_DEL,fd,NULL);
-        memset(&conn_list[fd],0,sizeof(conn_list[fd]));
+        epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+        memset(&conn_list[fd], 0, sizeof(conn_list[fd]));
         return -1;
     }
-    //如果客户端断开连接
-    if (count==0) {
-        printf("client disconnect,won't use the number %d clientfd\n",fd);
-        //将第connfd号clientfd关掉
+
+    if (count == 0) {
+        printf("client disconnect,won't use the number %d clientfd\n", fd);
         close(fd);
-        //使用EPOLL_CTL_DEL将其删除
-        epoll_ctl(epfd,EPOLL_CTL_DEL,fd,NULL);
-        memset(&conn_list[fd],0,sizeof(conn_list[fd]));
-        //继续进行下一次循环
+        epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+        memset(&conn_list[fd], 0, sizeof(conn_list[fd]));
         return 0;
     }
-    conn_list[fd].rlength=count;
 
-    printf("successful recv %d bytes form clientfd:%d\nRECV:%s\n",conn_list[fd].rlength,fd,conn_list[fd].rbuffer);
+    conn_list[fd].rlength = count;
 
-#if 0   //echo重复
-    conn_list[fd].wlength=conn_list[fd].rlength;
-    memset(conn_list[fd].wbuffer,0,BUFFER_LENGTH);
-    memcpy(conn_list[fd].wbuffer,conn_list[fd].rbuffer,conn_list[fd].rlength);
-#else
-    http_request(&conn_list[fd]);
-#endif
+    printf("Received %d bytes in state %d\n", count, conn_list[fd].status);
 
-    set_event(fd,EPOLLOUT,0);
+    // 根据状态处理接收到的数据
+    if (conn_list[fd].status == 0) {
+        // 状态0：处理握手请求
+        printf("Processing handshake request...\n");
+        ws_request(&conn_list[fd]);
+        // 握手处理后需要发送响应
+        set_event(fd, EPOLLOUT, 0);
+    } else if (conn_list[fd].status == 1) {
+        // 状态1：处理WebSocket数据帧
+        printf("Processing WebSocket data frame...\n");
+        ws_request(&conn_list[fd]);
+
+        // 如果处理后有数据要发送，切换到可写状态
+        if (conn_list[fd].status == 2) {
+            set_event(fd, EPOLLOUT, 0);
+        }
+    }
 
     return count;
 }
 
 int send_cb(int fd) {
+    if (conn_list[fd].status == 0) {
+        // 发送握手响应
+        printf("Sending handshake response, length: %d\n", conn_list[fd].wlength);
+        int count = send(fd, conn_list[fd].wbuffer, conn_list[fd].wlength, 0);
+        printf("Handshake response sent: %d bytes\n", count);
 
-#if 1
-    http_response(&conn_list[fd]);
-#endif
-    int count=0;
+        if (count > 0) {
+            // 握手完成后，状态切换到1，准备接收数据帧
+            conn_list[fd].status = 1;
+            printf("Handshake completed, switching to state 1\n");
+            set_event(fd, EPOLLIN, 0);
+        }
 
-    if (conn_list[fd].status==1) {
-        count=send(fd,conn_list[fd].wbuffer,conn_list[fd].wlength,0);
-        printf("%s\n",conn_list[fd].wbuffer);
-        printf("successful send %d bytes\n",count);
+    } else if (conn_list[fd].status == 2) {
+        // 准备WebSocket数据帧响应
+        ws_response(&conn_list[fd]);
 
-        set_event(fd,EPOLLOUT,0);
-    }else if (conn_list[fd].status==2) {
-        set_event(fd,EPOLLOUT,0);
-    }else if (conn_list[fd].status==0) {
-        set_event(fd,EPOLLIN,0);
+        if (conn_list[fd].wlength > 0) {
+            printf("Sending WebSocket data, length: %d\n", conn_list[fd].wlength);
+            int count = send(fd, conn_list[fd].wbuffer, conn_list[fd].wlength, 0);
+            printf("WebSocket data sent: %d bytes\n", count);
+
+            if (count > 0) {
+                // 发送完成后，状态回到1，准备接收下一个数据帧
+                conn_list[fd].status = 1;
+                printf("Data sent, switching back to state 1\n");
+            }
+        }
+
+        set_event(fd, EPOLLIN, 0);
     }
 
     return 0;

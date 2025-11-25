@@ -1,11 +1,14 @@
 <component name="ProjectDictionaryState">
   <dictionary name="project">
     <words>
+      <w>allbuf</w>
       <w>aname</w>
+      <w>bptr</w>
       <w>clientaddr</w>
       <w>clientfd</w>
       <w>connfd</w>
       <w>defaultdb</w>
+      <w>dpwcgvce</w>
       <w>epfd</w>
       <w>epollin</w>
       <w>epollout</w>
@@ -15,13 +18,18 @@
       <w>filefd</w>
       <w>fopen</w>
       <w>gethostbyname</w>
+      <w>handshark</w>
       <w>inaddr</w>
       <w>islistenfd</w>
+      <w>lcrypto</w>
+      <w>linebuf</w>
       <w>lmysqlclient</w>
       <w>lpthread</w>
+      <w>lssl</w>
       <w>maxevents</w>
       <w>nready</w>
       <w>ntoa</w>
+      <w>ophdr</w>
       <w>qclass</w>
       <w>querys</w>
       <w>rbuffer</w>

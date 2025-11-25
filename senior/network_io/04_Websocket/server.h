@@ -32,10 +32,19 @@ struct conn {
         如果 c->status == 1，使用 sendfile 发送文件内容。
         如果 c->status == 2，清理状态，准备处理下一个请求。
      **/
+    /**
+    根据 c->status 的值，分阶段处理 Websocket 响应：
+        如果 c->status == 0，表示尚未握手，调用 handshark 函数进行握手。
+        如果 c->status == 1，表示握手完成，调用 decode_packet 函数解码数据帧。
+        如果 c->status == 2，表示需要发送响应，调用 encode_packet 函数编码数据帧。
+     **/
+#if 1 // websocket
+    char *payload;
+    char mask[4];
+#endif
 };
 
-
-int http_request(struct conn *c);
-int http_response(struct conn *c);
+int ws_request(struct conn *c);
+int ws_response(struct conn *c);
 
 #endif //SERVER_H
