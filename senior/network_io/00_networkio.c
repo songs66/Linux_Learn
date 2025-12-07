@@ -166,7 +166,7 @@ int main() {
             }
         }
     }
-#elif 0 //使用pool来代替select，因为参数简洁，代码比select简洁
+#elif 0 //使用poll来代替select，因为参数简洁，代码比select简洁
     struct pollfd fds[1024]={0};
     fds[sockfd].fd=sockfd;
     fds[sockfd].events=POLLIN;
