@@ -19,8 +19,8 @@ add_definitions(-D__linux__ -D__gnu_linux__ -D_POSIX_SOURCE -D_GNU_SOURCE)
 add_executable(mycode
         junior/01_count/count.cpp
         junior/06_dns/dns.c
-        senior/network_io/04_Websocket/websocket.c
-        senior/network_io/04_Websocket/reactor.c
-        senior/2.2.3-udp-kcp-quic/kcp_demo/ikcp.c
-        senior/2.2.3-udp-kcp-quic/kcp_demo/ikcp.h
+        senior/2.1_network_io/04_Websocket/websocket.c
+        senior/2.1_network_io/04_Websocket/reactor.c
+        senior/2.2.3_udp-kcp-quic/kcp_demo/ikcp.c
+        senior/2.2.3_udp-kcp-quic/kcp_demo/ikcp.h
 )
