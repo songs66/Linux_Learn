@@ -1,43 +1,42 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-
-project(kcp LANGUAGES C)
+cmake_minimum_required(VERSION 3.16)
+project(kcp LANGUAGES C CXX)
 
 include(CTest)
 include(GNUInstallDirs)
-SET(CMAKE_BUILD_TYPE "Debug")
-SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb -std=c++11")
-SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O0 -Wall -std=c++11")
 
- 
+# ===== Core library: ikcp =====
+add_library(kcp STATIC src/ikcp.c)
+add_library(kcp::kcp ALIAS kcp)
 
-add_library(kcp STATIC ikcp.c)
-
-install(FILES ikcp.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-install(TARGETS kcp
-    EXPORT kcp-targets
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+# 让“链接 kcp 的人”也能找到 ikcp.h
+target_include_directories(kcp
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-install(EXPORT kcp-targets
-    FILE kcp-config.cmake
-    NAMESPACE kcp::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/kcp
-)
+# (可选) 你想强制 C 标准的话：
+# target_compile_features(kcp PUBLIC c_std_99)
+
+# ===== Subdirectories =====
+add_subdirectory(apps/demo_c)
+add_subdirectory(apps/chat)
 
 if (BUILD_TESTING)
-    enable_language(CXX)
-    
-    add_executable(client client.c ikcp.c delay.c)
-    target_link_libraries(client pthread)
-    add_executable(server server.c ikcp.c)
-    add_executable(test_kcp test.cpp ikcp.c)
-    add_executable(chat_server chat_server.cc kcp_server.cc kcp_session.cc udp_socket.cc ikcp.c)
-    target_link_libraries(chat_server pthread)
-    add_executable(chat_client chat_client.cc kcp_client.cc kcp_session.cc udp_socket.cc ikcp.c)
-    target_link_libraries(chat_client pthread)
-    if(MSVC AND NOT (MSVC_VERSION LESS 1900))
-        target_compile_options(kcp_test PRIVATE /utf-8)
-    endif()
-endif ()
+    add_subdirectory(tests)
+endif()
+
+# ===== Install =====
+install(TARGETS kcp
+        EXPORT kcp-targets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(FILES include/ikcp.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(EXPORT kcp-targets
+        FILE kcp-config.cmake
+        NAMESPACE kcp::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/kcp
+)

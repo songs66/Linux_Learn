@@ -21,6 +21,5 @@ add_executable(mycode
         junior/06_dns/dns.c
         senior/2.1_network_io/04_Websocket/websocket.c
         senior/2.1_network_io/04_Websocket/reactor.c
-        senior/2.2.3_udp-kcp-quic/kcp_demo/ikcp.c
-        senior/2.2.3_udp-kcp-quic/kcp_demo/ikcp.h
+
 )

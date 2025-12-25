@@ -19,10 +19,12 @@
       <w>fopen</w>
       <w>gethostbyname</w>
       <w>handshark</w>
+      <w>ikcp</w>
       <w>inaddr</w>
       <w>islistenfd</w>
       <w>lcrypto</w>
       <w>linebuf</w>
+      <w>listenfd</w>
       <w>lmysqlclient</w>
       <w>lpthread</w>
       <w>lssl</w>

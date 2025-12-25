@@ -14,37 +14,55 @@
 #include <errno.h>
 #include <arpa/inet.h>
 
-enum { STACK_SIZE = 16*1024, MAX_EVENTS = 64 };
+enum {
+    STACK_SIZE = 16*1024,
+    MAX_EVENTS = 64
+};
+
+//用于表示协程入口函数
 typedef void (*proc_t)(void *);
 
+//定义协程结构体
 typedef struct coro {
-    ucontext_t ctx;
-    char       stack[STACK_SIZE];
+    //用于保存上下文和协程私有栈空间，
+    ucontext_t ctx;                 //是保存“CPU 寄存器快照”的一个结构体，用于保存瞬间状态，保存程序运行到哪了的关键信息
+    char       stack[STACK_SIZE];   //存放协程的存局部变量和函数调用链，提供持久空间
 
+    //协程入口函数及其参数
     proc_t     entry;
     void      *arg;
 
+    //协程状态（0 新建、1 运行、2 挂起、3 死亡）
     int        state;          // 0:NEW  1:RUN  2:SUSPEND  3:DEAD
+    //存放操作的fd和有关此fd的事件
     int        wait_fd;
     int        wait_event;     // EPOLLIN / EPOLLOUT
 } coro;
 
+//协程调度器
 typedef struct schedule {
-    ucontext_t main;
-    int        epfd;
-    int        cur_id;
-    int        cap;
-    coro     **co;
-    int        listenfd;
+    ucontext_t main;        //调度器自身上下文
+    int        epfd;        //总epoll
+    int        cur_id;      //当前正在运行的协程 id（index），或 -1 表示无协程在运行
+    int        cap;         //当前协程数组的容量（也同时作为下一个分配 id）
+    coro     **co;          //指向coro* 指针数组（协程池）
+    int        listenfd;    //监听 socket 的 fd（用于在 epoll 事件中识别 listen 事件）
 } schedule;
 
+
+//全局指针，指向当前的 schedule，供被 hook 的 read/write 使用（在系统调用钩子里需要访问调度器状态）
 static schedule *g_sched;
 
 /* ----------------- forward ----------------- */
+//协程核心
 static void coro_body(schedule *S);
+//用于创建一个协程
 static int coro_create(schedule *S, proc_t func, void *arg);
+//恢复协程
 static void coro_resume(schedule *S, int id);
+//挂起协程
 static void coro_yield(schedule *S);
+//调度循环
 static void schedule_loop(schedule *S);
 
 /* ----------------- coroutine core ----------------- */
