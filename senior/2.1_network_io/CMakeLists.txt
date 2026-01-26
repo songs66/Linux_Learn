@@ -1,4 +1,8 @@
 # 网络 I/O 学习项目
+
+# 设置网络 I/O 的输出目录
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/senior/2.1_network_io)
+
 add_executable(00_networkio 00_networkio.c)
 add_executable(01_reactor 01_reactor.c)
 add_executable(02_reactor_listen_multiple_ports 02_reactor_listen_multiple_ports.c)

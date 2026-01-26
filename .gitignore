@@ -60,33 +60,3 @@ Thumbs.db
 # 核心转储
 core
 core.*
-
-# 特定项目的可执行文件（保留原有的）
-# junior 部分
-junior/01_count/count
-junior/02_contacts/contacts
-junior/03_pthread/00_thread
-junior/03_pthread/01_mutexlock
-junior/03_pthread/02_spinlock
-junior/03_pthread/03_atomiclock
-junior/04_threadpool/Threadpool
-junior/05_mysql/mysql
-junior/06_dns/dns
-junior/06_dns/learn/dns
-junior/06_dns/learn/dnspro
-junior/06_dns/learn/dnspropro
-junior/07_http/httprequest
-junior/07_http/xinzhi_httprequest
-junior/08_tcp_server/tcp_server
-junior/09_tcp_server_listen_multiple_ports/tcp_server_listen_multiple_ports
-junior/mul_port_client_epoll
-
-# senior 部分
-senior/2.1_network_io/00_networkio
-senior/2.1_network_io/01_reactor
-senior/2.1_network_io/02_reactor_listen_multiple_ports
-senior/2.1_network_io/03_Webserver/Webserver
-senior/2.1_network_io/03_Webserver/reactor
-senior/2.1_network_io/04_Websocket/Websocket
-senior/2.1_network_io/04_Websocket/reactor
-senior/2.1_network_io/mul_port_client_epoll

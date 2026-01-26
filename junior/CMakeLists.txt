@@ -1,6 +1,9 @@
 # Junior 学习项目
 cmake_minimum_required(VERSION 3.16)
 
+# 设置 Junior 的输出目录
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/junior)
+
 # 基础练习项目
 add_executable(count 01_count/count.cpp)
 

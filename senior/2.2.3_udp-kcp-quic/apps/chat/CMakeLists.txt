@@ -1,5 +1,8 @@
 find_package(Threads REQUIRED)
 
+# 设置 chat 的输出目录
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/senior/2.2.3_udp-kcp-quic/chat)
+
 # chat_server
 add_executable(chat_server
         chat_server.cc
