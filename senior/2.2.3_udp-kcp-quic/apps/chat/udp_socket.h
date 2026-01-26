@@ -1,15 +1,21 @@
 #ifndef UDP_SOCKET_H_
 #define UDP_SOCKET_H_
 // 包含通用头文件
- 
 #include <fcntl.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <string.h>
+#include <netdb.h>
 #include <unistd.h>
-#include <iostream>
-#include <errno.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+
+#include <cerrno>
+#include <cstdint>
 #include <memory>
+#include <stdbool.h>
+#include <stdexcept>
+#include <stdint.h>
+#include <string>
+
 #include "trace.h"
 class UdpSocket // udp的封装
 {

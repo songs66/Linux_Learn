@@ -1,5 +1,6 @@
 #include "udp_socket.h"
 #include <sstream>
+#include <cstring>
 UdpSocket::UdpSocket(const std::string &ip, uint16_t port, int family)
     : ip_(ip), port_(port), family_(family) {
     addr_.sin_family = family_;

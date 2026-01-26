@@ -3,6 +3,8 @@
 #include <sys/time.h>
 #include <thread>
 #include <unistd.h>
+#include <cstring>   // memcmp
+
 /* get system time */
 static inline void itimeofday(long *sec, long *usec) {
     struct timeval time;

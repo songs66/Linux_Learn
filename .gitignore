@@ -1,3 +1,92 @@
+# IDE 配置文件
 .idea/
 .vscode/
-/senior/2.2.3_udp-kcp-quic/build/
+*.swp
+*.swo
+*~
+
+# 构建目录
+build/
+**/build/
+cmake-build-*/  # CLion 等 IDE 的构建目录
+out/
+
+# CMake 生成的文件
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+DartConfiguration.tcl
+Testing/
+compile_commands.json
+
+# 可执行文件
+*.exe
+*.out
+*.app
+
+# 目标文件和库
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+
+# 调试和临时文件
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# 依赖包
+vcpkg_installed/
+conan/
+
+# 日志文件
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 备份文件
+*.bak
+*.backup
+*.orig
+
+# 核心转储
+core
+core.*
+
+# 特定项目的可执行文件（保留原有的）
+# junior 部分
+junior/01_count/count
+junior/02_contacts/contacts
+junior/03_pthread/00_thread
+junior/03_pthread/01_mutexlock
+junior/03_pthread/02_spinlock
+junior/03_pthread/03_atomiclock
+junior/04_threadpool/Threadpool
+junior/05_mysql/mysql
+junior/06_dns/dns
+junior/06_dns/learn/dns
+junior/06_dns/learn/dnspro
+junior/06_dns/learn/dnspropro
+junior/07_http/httprequest
+junior/07_http/xinzhi_httprequest
+junior/08_tcp_server/tcp_server
+junior/09_tcp_server_listen_multiple_ports/tcp_server_listen_multiple_ports
+junior/mul_port_client_epoll
+
+# senior 部分
+senior/2.1_network_io/00_networkio
+senior/2.1_network_io/01_reactor
+senior/2.1_network_io/02_reactor_listen_multiple_ports
+senior/2.1_network_io/03_Webserver/Webserver
+senior/2.1_network_io/03_Webserver/reactor
+senior/2.1_network_io/04_Websocket/Websocket
+senior/2.1_network_io/04_Websocket/reactor
+senior/2.1_network_io/mul_port_client_epoll

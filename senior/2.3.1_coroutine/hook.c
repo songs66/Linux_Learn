@@ -20,6 +20,8 @@
 #include <sys/poll.h>
 #include <sys/epoll.h>
 
+static ucontext_t ctx_main;   /* 主调度器上下文 */
+static ucontext_t *ctx_now;   /* 当前协程上下文 */
 
 #if 1
 // hook
@@ -44,7 +46,14 @@ ssize_t read(int fd, void *buf, size_t count) {
 
 		// fd --> epoll_ctl();
 
-		swapcontext(); // fd --> ctx
+		/* 第一次调用时把调度器上下文记下来 */
+		if (!ctx_now) {
+		    getcontext(&ctx_main);
+		    ctx_now = &ctx_main;
+		}
+		
+		/* 把当前协程上下文保存到 ctx_now，然后切到调度器 ctx_main */
+		swapcontext(ctx_now, &ctx_main);
 		
 	}
 	// io
