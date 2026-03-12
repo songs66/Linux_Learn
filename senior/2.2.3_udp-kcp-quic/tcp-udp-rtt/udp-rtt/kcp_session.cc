@@ -76,6 +76,7 @@ bool KcpSession::Update(int64_t current) {
         // TRACE("client keep alive: ", current/1000);
         send_latest_time = current; // 独立发送保活信息
         int ret = Send(KCP_KEEP_ALIVE_CMD, sizeof(KCP_KEEP_ALIVE_CMD));
+        if(ret){}
     }
 
     return false;
