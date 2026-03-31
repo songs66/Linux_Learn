@@ -1,7 +1,7 @@
 find_package(Threads REQUIRED)
 
 # 设置 demo_c 的输出目录
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/senior/2.2.3_udp-kcp-quic/demo_c)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/senior/2.2_udp-kcp-quic/demo_c)
 
 add_executable(client client.c delay.c)
 target_link_libraries(client PRIVATE kcp::kcp Threads::Threads)

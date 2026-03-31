@@ -5,7 +5,7 @@ include(CTest)
 include(GNUInstallDirs)
 
 # 设置 KCP 可执行文件的输出目录
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/senior/2.2.3_udp-kcp-quic)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/senior/2.2_udp-kcp-quic)
 
 # ===== Core library: ikcp =====
 add_library(kcp STATIC src/ikcp.c)

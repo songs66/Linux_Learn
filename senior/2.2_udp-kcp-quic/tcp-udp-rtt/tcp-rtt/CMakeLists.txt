@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(tcp_rtt LANGUAGES C CXX)
 
 # 设置 TCP-RTT 的输出目录
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/senior/2.2.3_udp-kcp-quic/tcp-udp-rtt/tcp-rtt)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/senior/2.2_udp-kcp-quic/tcp-udp-rtt/tcp-rtt)
 
 # 找到线程库
 find_package(Threads REQUIRED)
