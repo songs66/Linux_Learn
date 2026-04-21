@@ -70,7 +70,7 @@ set(TESTCASE_SOURCES
 # ============================================
 
 # 创建kvstore主程序目标（从KVSTORE_SOURCES源文件构建）
-add_executable(kvstore ${KVSTORE_SOURCES})
+add_executable(kvstore1 ${KVSTORE_SOURCES})
 
 # 创建testcase测试程序目标
 add_executable(testcase ${TESTCASE_SOURCES})
@@ -81,7 +81,7 @@ target_include_directories(kvstore PRIVATE
 )
 
 # 将告警和优化选项绑定到当前目标，而不是整个工程
-target_compile_options(kvstore PRIVATE ${COMMON_COMPILE_FLAGS})
+target_compile_options(kvstore1 PRIVATE ${COMMON_COMPILE_FLAGS})
 target_compile_options(testcase PRIVATE ${COMMON_COMPILE_FLAGS})
 
 
@@ -90,7 +90,7 @@ target_compile_options(testcase PRIVATE ${COMMON_COMPILE_FLAGS})
 # ============================================
 
 # 为kvstore链接所需的库
-target_link_libraries(kvstore 
+target_link_libraries(kvstore1 
     # 直接指定NtyCo静态库的完整路径（避免复制问题）
     # 使用${CMAKE_CURRENT_SOURCE_DIR}确保是源码目录的绝对路径
     ${CMAKE_CURRENT_SOURCE_DIR}/NtyCo/libntyco.a
@@ -104,7 +104,7 @@ target_link_libraries(kvstore
 
 # 如果系统支持io_uring（头文件存在），则额外链接liburing库
 if(HAVE_IO_URING_H)
-    target_link_libraries(kvstore uring)
+    target_link_libraries(kvstore1 uring)
 endif()
 
 
@@ -113,7 +113,7 @@ endif()
 # ============================================
 
 # 为kvstore定义编译时宏（控制哪些存储引擎被启用）
-target_compile_definitions(kvstore PRIVATE
+target_compile_definitions(kvstore1 PRIVATE
     ENABLE_ARRAY=1   # 启用数组存储引擎
     ENABLE_RBTREE=1  # 启用红黑树存储引擎
     ENABLE_HASH=1    # 启用哈希表存储引擎
@@ -139,6 +139,6 @@ target_link_libraries(testcase
 # 定义安装规则：
 # 执行 `cmake --install build` 或 `make install` 后，
 # 会把这两个可执行文件复制到安装前缀下的 bin 目录
-install(TARGETS kvstore testcase
+install(TARGETS kvstore1 testcase
     RUNTIME DESTINATION bin
 )
