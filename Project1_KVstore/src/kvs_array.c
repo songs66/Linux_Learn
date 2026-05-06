@@ -1,9 +1,18 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <stddef.h>
+
+#include "kvs_array.h"
 #include "kvstore.h"
 
 
 kvs_array_t global_array = {0};
 
-int kvs_array_create(kvs_array_t *inst){
+int kvs_array_create(void *engine) {
+    kvs_array_t *inst = (kvs_array_t *)engine;
+
     if (!inst) return -1;
 	if (inst->table) {
 		printf("table has alloc\n");
@@ -21,11 +30,21 @@ int kvs_array_create(kvs_array_t *inst){
 }
 
 
-void kvs_array_destory(kvs_array_t *inst) {
+void kvs_array_destroy(void *engine) {
+    kvs_array_t *inst = (kvs_array_t *)engine;
+
 	if (!inst) return ;
 
 	if (inst->table) {
+
+		for(int i=0;i<inst->total;i++){
+			kvs_free(inst->table[i].key);
+			kvs_free(inst->table[i].value);
+		}
+
 		kvs_free(inst->table);
+		inst->table=NULL;
+		inst->total=0;
 	}
 }
 
@@ -33,7 +52,8 @@ void kvs_array_destory(kvs_array_t *inst) {
 /*
  * @return: <0, error; =0, success; >0, exist
  */
-int kvs_array_set(kvs_array_t *inst, char *key, char *value) {
+int kvs_array_set(void *engine, char *key, char *value) {
+    kvs_array_t *inst = (kvs_array_t *)engine;
 
 	if (inst == NULL || key == NULL || value == NULL) return -1;
 	if (inst->total == KVS_ARRAY_SIZE) {
@@ -64,7 +84,8 @@ int kvs_array_set(kvs_array_t *inst, char *key, char *value) {
 }
 
 
-char* kvs_array_get(kvs_array_t *inst, char *key) {
+char* kvs_array_get(void *engine, char *key) {
+    kvs_array_t *inst = (kvs_array_t *)engine;
 
 	if (inst == NULL || key == NULL) return NULL;
 
@@ -86,7 +107,8 @@ char* kvs_array_get(kvs_array_t *inst, char *key) {
 /*
  * @return < 0, error;  =0,  success; >0, no exist
  */
-int kvs_array_del(kvs_array_t *inst, char *key) {
+int kvs_array_del(void *engine, char *key) {
+    kvs_array_t *inst = (kvs_array_t *)engine;
 
     if (inst == NULL || key == NULL) return -1;
 
@@ -121,7 +143,8 @@ int kvs_array_del(kvs_array_t *inst, char *key) {
 /*
  * @return : < 0, error; =0, success; >0, no exist 
  */
-int kvs_array_mod(kvs_array_t *inst, char *key, char *value) {
+int kvs_array_mod(void *engine, char *key, char *value) {
+    kvs_array_t *inst = (kvs_array_t *)engine;
 
 	if (inst == NULL || key == NULL || value == NULL) return -1;
 	if (inst->total == 0) {
@@ -157,7 +180,8 @@ int kvs_array_mod(kvs_array_t *inst, char *key, char *value) {
 /*
  * @return 0: exist, 1: no exist
  */
-int kvs_array_exist(kvs_array_t *inst, char *key) {
+int kvs_array_exist(void *engine, char *key) {
+    kvs_array_t *inst = (kvs_array_t *)engine;
 
 	if (!inst || !key) return -1;
 	
