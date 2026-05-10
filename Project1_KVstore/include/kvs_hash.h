@@ -32,12 +32,12 @@ typedef struct hashtable_s {
 typedef struct hashtable_s kvs_hash_t;
 
 
-int kvs_hash_create(kvs_hash_t *hash);
-void kvs_hash_destory(kvs_hash_t *hash);
-int kvs_hash_set(hashtable_t *hash, char *key, char *value);
-char * kvs_hash_get(kvs_hash_t *hash, char *key);
-int kvs_hash_mod(kvs_hash_t *hash, char *key, char *value);
-int kvs_hash_del(kvs_hash_t *hash, char *key);
-int kvs_hash_exist(kvs_hash_t *hash, char *key);
+int kvs_hash_create(void *engine);
+void kvs_hash_destroy(void *engine);
+int kvs_hash_set(void *engine, char *key, char *value);
+char * kvs_hash_get(void *engine, char *key);
+int kvs_hash_mod(void *engine, char *key, char *value);
+int kvs_hash_del(void *engine, char *key);
+int kvs_hash_exist(void *engine, char *key);
 
 #endif

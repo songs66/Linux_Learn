@@ -197,8 +197,18 @@ int init_kvengine(void) {
 #endif
 
 #if ENABLE_HASH
-	memset(&global_hash, 0, sizeof(kvs_hash_t));
-	kvs_hash_create(&global_hash);
+	g_engine.engine = &global_hash;
+
+	g_engine.ops.create=kvs_hash_create;
+	g_engine.ops.destroy=kvs_hash_destroy;
+	g_engine.ops.set=kvs_hash_set;
+	g_engine.ops.get=kvs_hash_get;
+	g_engine.ops.del=kvs_hash_del;
+	g_engine.ops.mod=kvs_hash_mod;
+	g_engine.ops.exist=kvs_hash_exist;
+
+	memset(g_engine.engine,0,sizeof(kvs_hash_t));
+	g_engine.ops.create(g_engine.engine);
 #endif
 
 #if ENABLE_RBTREE
@@ -210,17 +220,7 @@ int init_kvengine(void) {
 }
 
 void dest_kvengine(void) {
-#if ENABLE_ARRAY
-	// kvs_array_destory(&global_array);
 	g_engine.ops.destroy(g_engine.engine);
-#endif
-#if ENABLE_RBTREE
-	kvs_rbtree_destory(&global_rbtree);
-#endif
-#if ENABLE_HASH
-	kvs_hash_destory(&global_hash);
-#endif
-
 }
 
 
