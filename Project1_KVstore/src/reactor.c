@@ -24,7 +24,6 @@
 #if ENABLE_KVSTORE
 
 typedef int (*msg_handler)(char *msg, int length, char *response);
-
 static msg_handler kvs_handler;
 
 int kvs_request(struct conn *c) {
@@ -181,7 +180,7 @@ int send_cb(int fd) {
 }
 
 //用于初始化sockfd，并且开始监听，返回sockfd的值
-int init_server(const unsigned short port) {
+static int init_server(const unsigned short port) {
     //创建用于监听的sockfd
     int sockfd=socket(AF_INET,SOCK_STREAM,0);
 

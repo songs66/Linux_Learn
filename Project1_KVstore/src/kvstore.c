@@ -233,11 +233,11 @@ int main(int argc, char *argv[]) {
 	init_kvengine();
 
 #if (NETWORK_SELECT == NETWORK_REACTOR)
-	reactor_start(port, kvs_protocol);  //
+	reactor_start(port, kvs_protocol);
 #elif (NETWORK_SELECT == NETWORK_PROACTOR)
-	ntyco_start(port, kvs_protocol);
-#elif (NETWORK_SELECT == NETWORK_NTYCO)
 	proactor_start(port, kvs_protocol);
+#elif (NETWORK_SELECT == NETWORK_NTYCO)
+	ntyco_start(port, kvs_protocol);
 #endif
 
 	dest_kvengine();
