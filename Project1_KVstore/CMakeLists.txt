@@ -10,6 +10,7 @@ set(SRC_FILES
     src/kvs_array.c
     src/kvs_hash.c
     src/proactor.c
+    src/ntyco_server.c
 )
 
 set(TEST_SRC_FILES
@@ -20,7 +21,18 @@ add_executable(kvstore ${SRC_FILES})
 
 add_executable(kvstore_test ${TEST_SRC_FILES})
 
-target_include_directories(kvstore PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(kvstore PRIVATE uring)
+find_package(Threads REQUIRED)
+
+target_include_directories(kvstore PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/NtyCo/core
+)
+
+target_link_libraries(kvstore PRIVATE 
+    uring
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/NtyCo/libntyco.a
+    Threads::Threads
+    ${CMAKE_DL_LIBS}
+)
 
 target_include_directories(kvstore_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
