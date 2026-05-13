@@ -8,11 +8,14 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 # 服务端主程序：共享协议层、存储层和多种网络层实现
 set(SRC_FILES
     src/kvstore.c
+
     src/reactor.c
-    src/kvs_array.c
-    src/kvs_hash.c
     src/proactor.c
     src/ntyco_server.c
+    
+    src/kvs_array.c
+    src/kvs_hash.c
+    src/kvs_rbtree.c
 )
 
 # 客户端测试程序：负责发命令并校验服务端返回值

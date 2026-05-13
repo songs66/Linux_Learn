@@ -200,8 +200,18 @@ int init_kvengine(void) {
 #endif
 
 #if ENABLE_RBTREE
-	memset(&global_rbtree, 0, sizeof(kvs_rbtree_t));
-	kvs_rbtree_create(&global_rbtree);
+	g_engine.engine = &global_rbtree;
+
+	g_engine.ops.create=kvs_rbtree_create;
+	g_engine.ops.destroy=kvs_rbtree_destroy;
+	g_engine.ops.set=kvs_rbtree_set;
+	g_engine.ops.get=kvs_rbtree_get;
+	g_engine.ops.del=kvs_rbtree_del;
+	g_engine.ops.mod=kvs_rbtree_mod;
+	g_engine.ops.exist=kvs_rbtree_exist;
+
+	memset(g_engine.engine,0,sizeof(kvs_rbtree_t));
+	g_engine.ops.create(g_engine.engine);
 #endif
 
 	return 0;
