@@ -72,8 +72,8 @@ int connect_tcpserver(const char *ip, unsigned short port) {
 	
 }
 
-// 数组版基础功能回归测试
-void array_testcase(int connfd) {
+// 基础功能回归测试
+void testcase_basics(int connfd) {
 
 	testcase(connfd, "SET Teacher King", "OK\r\n", "SET-Teacher");
 	testcase(connfd, "GET Teacher", "King\r\n", "GET-Teacher");
@@ -86,8 +86,9 @@ void array_testcase(int connfd) {
 	testcase(connfd, "EXIST Teacher", "NO EXIST\r\n", "GET-Teacher");
 
 }
+
 // 高频循环测试：用于观察基础功能稳定性和粗略性能
-void array_testcase_1w(int connfd) {
+void testcase_1w(int connfd) {
 
 	int count = 10000;
 	int i = 0;
@@ -118,54 +119,9 @@ void array_testcase_1w(int connfd) {
 
 }
 
-// 红黑树版基础功能回归测试
-void rbtree_testcase(int connfd) {
 
-	testcase(connfd, "RSET Teacher King", "OK\r\n", "RSET-Teacher");
-	testcase(connfd, "RGET Teacher", "King\r\n", "RGET-King-Teacher");
-	testcase(connfd, "RMOD Teacher Darren", "OK\r\n", "RMOD-D-Teacher");
-	testcase(connfd, "RGET Teacher", "Darren\r\n", "RGET-Darren-Teacher");
-	testcase(connfd, "REXIST Teacher", "EXIST\r\n", "REXIST-Teacher");
-	testcase(connfd, "RDEL Teacher", "OK\r\n", "RDEL-Teacher");
-	testcase(connfd, "RGET Teacher", "NO EXIST\r\n", "RGET-K-Teacher");
-	testcase(connfd, "RMOD Teacher KING", "NO EXIST\r\n", "RMOD-K-Teacher");
-	testcase(connfd, "REXIST Teacher", "NO EXIST\r\n", "REXIST-Teacher");
-
-}
-// 红黑树版单 key 高频覆盖测试
-void rbtree_testcase_1w(int connfd) {
-
-	int count = 10000;
-	int i = 0;
-
-	struct timeval tv_begin;
-	gettimeofday(&tv_begin, NULL);
-
-	for (i = 0;i < count;i ++) {
-
-		testcase(connfd, "RSET Teacher King", "OK\r\n", "RSET-Teacher");
-		testcase(connfd, "RGET Teacher", "King\r\n", "RGET-King-Teacher");
-		testcase(connfd, "RMOD Teacher Darren", "OK\r\n", "RMOD-D-Teacher");
-		testcase(connfd, "RGET Teacher", "Darren\r\n", "RGET-Darren-Teacher");
-		testcase(connfd, "REXIST Teacher", "EXIST\r\n", "REXIST-Teacher");
-		testcase(connfd, "RDEL Teacher", "OK\r\n", "RDEL-Teacher");
-		testcase(connfd, "RGET Teacher", "NO EXIST\r\n", "RGET-K-Teacher");
-		testcase(connfd, "RMOD Teacher KING", "NO EXIST\r\n", "RMOD-K-Teacher");
-		testcase(connfd, "REXIST Teacher", "NO EXIST\r\n", "REXIST-Teacher");
-
-	}
-
-	struct timeval tv_end;
-	gettimeofday(&tv_end, NULL);
-
-	int time_used = TIME_SUB_MS(tv_end, tv_begin); // ms
-
-	printf("rbtree testcase --> time_used: %d, qps: %d\n", time_used, 90000 * 1000 / time_used);
-	
-}
-
-// 红黑树版多 key 批量读写测试
-void rbtree_testcase_3w(int connfd) {
+// 多 key 批量读写测试
+void testcase_3w(int connfd) {
 
 	int count = 10000;
 	int i = 0;
@@ -176,26 +132,26 @@ void rbtree_testcase_3w(int connfd) {
 	for (i = 0;i < count;i ++) {
 
 		char cmd[128] = {0};
-		snprintf(cmd, 128, "RSET Teacher%d King%d", i, i);
-		testcase(connfd, cmd, "OK\r\n", "RSET-Teacher");
+		snprintf(cmd, 128, "SET Teacher%d King%d", i, i);
+		testcase(connfd, cmd, "OK\r\n", "SET-Teacher");
 	}
 
 	for (i = 0;i < count;i ++) {
 
 		char cmd[128] = {0};
-		snprintf(cmd, 128, "RGET Teacher%d", i);
+		snprintf(cmd, 128, "GET Teacher%d", i);
 
 		char result[128] = {0};
 		snprintf(result, 128, "King%d\r\n", i);
 		
-		testcase(connfd, cmd, result, "RGET-King-Teacher");
+		testcase(connfd, cmd, result, "GET-King-Teacher");
 	}
 
 	for (i = 0;i < count;i ++) {
 
 		char cmd[128] = {0};
-		snprintf(cmd, 128, "RMOD Teacher%d King%d", i, i);
-		testcase(connfd, cmd, "OK\r\n", "RGET-King-Teacher");
+		snprintf(cmd, 128, "MOD Teacher%d King%d", i, i);
+		testcase(connfd, cmd, "OK\r\n", "GET-King-Teacher");
 	}
 
 	struct timeval tv_end;
@@ -204,20 +160,6 @@ void rbtree_testcase_3w(int connfd) {
 	int time_used = TIME_SUB_MS(tv_end, tv_begin); // ms
 
 	printf("rbtree testcase --> time_used: %d, qps: %d\n", time_used, 30000 * 1000 / time_used);
-
-}
-// 哈希表版基础功能回归测试
-void hash_testcase(int connfd) {
-
-	testcase(connfd, "HSET Teacher King", "OK\r\n", "HSET-Teacher");
-	testcase(connfd, "HGET Teacher", "King\r\n", "HGET-King-Teacher");
-	testcase(connfd, "HMOD Teacher Darren", "OK\r\n", "HMOD-D-Teacher");
-	testcase(connfd, "HGET Teacher", "Darren\r\n", "HGET-Darren-Teacher");
-	testcase(connfd, "HEXIST Teacher", "EXIST\r\n", "HEXIST-Teacher");
-	testcase(connfd, "HDEL Teacher", "OK\r\n", "HDEL-Teacher");
-	testcase(connfd, "HGET Teacher", "NO EXIST\r\n", "HGET-K-Teacher");
-	testcase(connfd, "HMOD Teacher KING", "NO EXIST\r\n", "HMOD-K-Teacher");
-	testcase(connfd, "HEXIST Teacher", "NO EXIST\r\n", "HEXIST-Teacher");
 
 }
 
@@ -237,13 +179,11 @@ int main(int argc, char *argv[]) {
 	int connfd = connect_tcpserver(ip, port);
 
 	if (mode == 0) {
-		rbtree_testcase_1w(connfd);
+		testcase_basics(connfd);
 	} else if (mode == 1) {
-		rbtree_testcase_3w(connfd);
+		testcase_1w(connfd);
 	} else if (mode == 2) {
-		array_testcase_1w(connfd);
-	} else if (mode == 3) {
-		hash_testcase(connfd);
+		testcase_3w(connfd);
 	}
 
 	return 0;

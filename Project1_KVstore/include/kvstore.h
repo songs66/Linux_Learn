@@ -17,8 +17,8 @@
 // 数据引擎开关：当前阶段通过编译期开关切到不同后端
 #define ENABLE_ARRAY		0
 #define ENABLE_HASH			0
-#define ENABLE_RBTREE		1
-#define ENABLE_SKIPTABLE	0
+#define ENABLE_RBTREE		0
+#define ENABLE_SKIPTABLE	1
 
 
 #if ENABLE_ARRAY

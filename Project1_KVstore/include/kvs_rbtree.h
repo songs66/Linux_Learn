@@ -14,6 +14,7 @@ typedef char* KEY_TYPE;
 typedef int KEY_TYPE;
 #endif
 
+// 红黑树节点：除了 key/value，还要维护颜色和父子关系
 typedef struct _rbtree_node {
 	unsigned char color;
 	struct _rbtree_node *right;
@@ -23,6 +24,7 @@ typedef struct _rbtree_node {
 	void *value;
 } rbtree_node;
 
+// 红黑树对象：使用 nil 哨兵节点统一处理边界情况
 typedef struct _rbtree {
 	rbtree_node *root;
 	rbtree_node *nil;

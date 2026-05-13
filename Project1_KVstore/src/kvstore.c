@@ -22,6 +22,10 @@ extern kvs_rbtree_t global_rbtree;
 extern kvs_hash_t global_hash;
 #endif
 
+#if ENABLE_SKIPTABLE
+extern kvs_skiptable_t global_skiptable;
+#endif
+
 
 // 统一内存入口：当前只是简单封装，后面切换内存策略时更集中
 void *kvs_malloc(size_t size) {
@@ -211,6 +215,21 @@ int init_kvengine(void) {
 	g_engine.ops.exist=kvs_rbtree_exist;
 
 	memset(g_engine.engine,0,sizeof(kvs_rbtree_t));
+	g_engine.ops.create(g_engine.engine);
+#endif
+
+#if ENABLE_SKIPTABLE
+	g_engine.engine = &global_skiptable;
+
+	g_engine.ops.create=kvs_skiptable_create;
+	g_engine.ops.destroy=kvs_skiptable_destroy;
+	g_engine.ops.set=kvs_skiptable_set;
+	g_engine.ops.get=kvs_skiptable_get;
+	g_engine.ops.del=kvs_skiptable_del;
+	g_engine.ops.mod=kvs_skiptable_mod;
+	g_engine.ops.exist=kvs_skiptable_exist;
+
+	memset(g_engine.engine,0,sizeof(kvs_skiptable_t));
 	g_engine.ops.create(g_engine.engine);
 #endif
 

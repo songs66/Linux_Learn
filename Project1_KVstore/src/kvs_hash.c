@@ -8,7 +8,7 @@
 #include "kvstore.h"
 
 
-kvs_hash_t global_hash;
+kvs_hash_t global_hash = {0};
 
 // 简易哈希函数：先把 key 的每个字节求和，再映射到桶下标
 static int _hash(const char *key, int size) {
