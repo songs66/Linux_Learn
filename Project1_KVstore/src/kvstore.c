@@ -7,7 +7,7 @@
 #include "kvstore.h"
 
 
-
+// 当前统一使用的存储引擎实例，由 init_kvengine() 完成注册
 kvs_engine_t g_engine;
 
 #if ENABLE_ARRAY
@@ -23,7 +23,7 @@ extern kvs_hash_t global_hash;
 #endif
 
 
-
+// 统一内存入口：当前只是简单封装，后面切换内存策略时更集中
 void *kvs_malloc(size_t size) {
 	return malloc(size);
 }
@@ -33,7 +33,7 @@ void kvs_free(void *ptr) {
 }
 
 
-
+// 当前支持的文本命令集合，协议层通过它把字符串映射为具体操作
 const char *command[] = {
 	"SET", "GET", "DEL", "MOD", "EXIST"
 };
@@ -71,10 +71,7 @@ int kvs_split_token(char *msg, char *tokens[]) {
 }
 
 
-// SET Key Value
-// tokens[0] : SET
-// tokens[1] : Key
-// tokens[2] : Value
+// 协议分发层：根据 tokens[0] 决定调用哪一个引擎接口
 int kvs_filter_protocol(char **tokens, int count, char *response) {
 
 	if (tokens[0] == NULL || count == 0 || response == NULL) return -1;
@@ -150,21 +147,12 @@ int kvs_filter_protocol(char **tokens, int count, char *response) {
 
 
 
-/*
- * msg: request message
- * length: length of request message
- * response: need to send
- * @return : length of response
- */
-
+// 协议统一入口：网络层只需要把完整请求交给这里处理即可
 int kvs_protocol(char *msg, int length, char *response) {
 #if 0//echo
 	memcpy(response, msg, length);
 	return length;
 #endif
-// SET Key Value
-// GET Key
-// DEL Key
 	if (msg == NULL || length <= 0 || response == NULL) return -1;
 
 	//printf("recv %d : %s\n", length, msg);
@@ -178,7 +166,7 @@ int kvs_protocol(char *msg, int length, char *response) {
 }
 
 
-
+// 根据编译期开关选择当前引擎，并把对应操作注册到 g_engine 中
 int init_kvengine(void) {
 
 #if ENABLE_ARRAY

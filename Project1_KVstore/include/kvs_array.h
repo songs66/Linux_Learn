@@ -2,20 +2,20 @@
 #define _KVS_ARRAY_H_
 
 
-//定义数组中的一个元素（一个槽位里的数据）：一条键值对记录（最底层的数据单元）
+// 数组中的一个槽位，对应一条最简单的 key/value 记录
 typedef struct kvs_array_item_s {
 	char *key;
 	char *value;
 } kvs_array_item_t;
 
-//定义数组型 KV 存储(kvs_array_t)默认最多开 1024 个槽位(kvs_array_item_t)
+// 数组版存储默认最大容量，适合做最小可运行原型
 #define KVS_ARRAY_SIZE		1024
 
-//数组版 KV 存储实例：整个数组型 KV 容器(整个数组引擎)
+// 数组版引擎实例：本质上是一个顺序表
 typedef struct kvs_array_s {
-    //指向真正存放键值对的数组
+    // 指向真正存放键值对的数组
 	kvs_array_item_t *table;
-    //表示当前已存入的元素数量，当前逻辑上已占用的条目计数
+    // 当前已存入的元素数量
 	int total;
 } kvs_array_t;
 

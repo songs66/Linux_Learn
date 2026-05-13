@@ -8,6 +8,7 @@
 #include "kvstore.h"
 
 
+// 当前数组引擎的全局实例，由上层在 init_kvengine() 中注册到统一接口表
 kvs_array_t global_array = {0};
 
 int kvs_array_create(void *engine) {
@@ -49,9 +50,7 @@ void kvs_array_destroy(void *engine) {
 }
 
 
-/*
- * @return: <0, error; =0, success; >0, exist
- */
+// 顺序表版 SET：先线性查重，再把新键值对追加到尾部
 int kvs_array_set(void *engine, char *key, char *value) {
     kvs_array_t *inst = (kvs_array_t *)engine;
 
@@ -83,7 +82,7 @@ int kvs_array_set(void *engine, char *key, char *value) {
 	return 0;
 }
 
-
+// 顺序表版 GET：通过线性扫描查找 key
 char* kvs_array_get(void *engine, char *key) {
     kvs_array_t *inst = (kvs_array_t *)engine;
 
@@ -104,9 +103,7 @@ char* kvs_array_get(void *engine, char *key) {
 }
 
 
-/*
- * @return < 0, error;  =0,  success; >0, no exist
- */
+// 顺序表版 DEL：删除命中元素后，把后面的元素整体前移
 int kvs_array_del(void *engine, char *key) {
     kvs_array_t *inst = (kvs_array_t *)engine;
 
@@ -140,9 +137,7 @@ int kvs_array_del(void *engine, char *key) {
 }
 
 
-/*
- * @return : < 0, error; =0, success; >0, no exist 
- */
+// 顺序表版 MOD：定位 key 后只替换 value，不调整整体结构
 int kvs_array_mod(void *engine, char *key, char *value) {
     kvs_array_t *inst = (kvs_array_t *)engine;
 
@@ -177,9 +172,7 @@ int kvs_array_mod(void *engine, char *key, char *value) {
 }
 
 
-/*
- * @return 0: exist, 1: no exist
- */
+// EXIST 本质上只是对 GET 的一次轻量封装
 int kvs_array_exist(void *engine, char *key) {
     kvs_array_t *inst = (kvs_array_t *)engine;
 

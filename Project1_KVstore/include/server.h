@@ -7,10 +7,11 @@
 #define ENABLE_WEBSOCKET	0
 #define ENABLE_KVSTORE		1
 
-//回调函数指针
+// 网络层统一按“fd -> 回调函数”方式分发事件
 typedef int (*RCALLBACK)(int fd);
 
 
+// conn 描述一个客户端连接在网络层中的完整收发状态
 struct conn {
 	int fd;
 
@@ -22,6 +23,7 @@ struct conn {
 
 	RCALLBACK send_callback;
 
+	// 监听 socket 走 accept_callback，普通连接走 recv_callback
 	union {
 		RCALLBACK recv_callback;
 		RCALLBACK accept_callback;

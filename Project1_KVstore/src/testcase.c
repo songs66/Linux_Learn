@@ -9,6 +9,7 @@
 #define TIME_SUB_MS(tv1, tv2)  ((tv1.tv_sec - tv2.tv_sec) * 1000 + (tv1.tv_usec - tv2.tv_usec) / 1000)
 
 
+// 测试客户端统一通过这两个函数和服务端收发消息
 int send_msg(int connfd, char *msg, int length) {
 
 	int res = send(connfd, msg, length, 0);
@@ -30,9 +31,7 @@ int recv_msg(int connfd, char *msg, int length) {
 
 }
 
-
-
-
+// 一条最小测试用例：发送命令、读取响应、直接比对预期结果
 void testcase(int connfd, char *msg, char *pattern, char *casename) {
 
 	if (!msg || !pattern || !casename) return ;
@@ -52,7 +51,7 @@ void testcase(int connfd, char *msg, char *pattern, char *casename) {
 }
 
 
-
+// 建立到 kvstore 服务端的测试连接
 int connect_tcpserver(const char *ip, unsigned short port) {
 
 	int connfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -73,7 +72,7 @@ int connect_tcpserver(const char *ip, unsigned short port) {
 	
 }
 
-
+// 数组版基础功能回归测试
 void array_testcase(int connfd) {
 
 	testcase(connfd, "SET Teacher King", "OK\r\n", "SET-Teacher");
@@ -87,7 +86,7 @@ void array_testcase(int connfd) {
 	testcase(connfd, "EXIST Teacher", "NO EXIST\r\n", "GET-Teacher");
 
 }
-
+// 高频循环测试：用于观察基础功能稳定性和粗略性能
 void array_testcase_1w(int connfd) {
 
 	int count = 10000;
@@ -119,7 +118,7 @@ void array_testcase_1w(int connfd) {
 
 }
 
-
+// 红黑树版基础功能回归测试
 void rbtree_testcase(int connfd) {
 
 	testcase(connfd, "RSET Teacher King", "OK\r\n", "RSET-Teacher");
@@ -133,7 +132,7 @@ void rbtree_testcase(int connfd) {
 	testcase(connfd, "REXIST Teacher", "NO EXIST\r\n", "REXIST-Teacher");
 
 }
-
+// 红黑树版单 key 高频覆盖测试
 void rbtree_testcase_1w(int connfd) {
 
 	int count = 10000;
@@ -165,7 +164,7 @@ void rbtree_testcase_1w(int connfd) {
 	
 }
 
-
+// 红黑树版多 key 批量读写测试
 void rbtree_testcase_3w(int connfd) {
 
 	int count = 10000;
@@ -207,7 +206,7 @@ void rbtree_testcase_3w(int connfd) {
 	printf("rbtree testcase --> time_used: %d, qps: %d\n", time_used, 30000 * 1000 / time_used);
 
 }
-
+// 哈希表版基础功能回归测试
 void hash_testcase(int connfd) {
 
 	testcase(connfd, "HSET Teacher King", "OK\r\n", "HSET-Teacher");
@@ -250,6 +249,5 @@ int main(int argc, char *argv[]) {
 	return 0;
 	
 }
-
 
 

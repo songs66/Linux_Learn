@@ -14,6 +14,7 @@
 
 #define ENABLE_KEY_CHAR		1
 
+// 红黑树版当前仍沿用字符串 key，便于和其它引擎保持统一命令格式
 #if ENABLE_KEY_CHAR
 typedef char* KEY_TYPE;
 #else
@@ -35,6 +36,7 @@ typedef struct _rbtree {
 } rbtree;
 
 
+// 统一对外暴露的红黑树引擎类型
 typedef struct _rbtree kvs_rbtree_t;
 
 int kvs_rbtree_create(kvs_rbtree_t *inst);

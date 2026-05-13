@@ -20,7 +20,7 @@
 
 #define TIME_SUB_MS(tv1, tv2)  ((tv1.tv_sec - tv2.tv_sec) * 1000 + (tv1.tv_usec - tv2.tv_usec) / 1000)
 
-
+// reactor 版网络层通过业务处理函数指针，把请求交给协议层
 #if ENABLE_KVSTORE
 
 typedef int (*msg_handler)(char *msg, int length, char *response);
@@ -37,20 +37,16 @@ int kvs_response(struct conn *c) {
 }
 
 #endif
-
-
-
-//定义全局的epfd
+// 全局 epoll fd：整个 reactor 事件循环只维护这一份
 int epfd=0;
-//结构体conn数组conn_list：(使用fd的数字作为下标)
+// 用 fd 直接作为下标，快速定位每个连接对应的状态
 struct conn conn_list[CONNECTION_SIZE];
 
 int accept_cb(int fd);  //sockfd可读的回调函数
 int recv_cb(int fd);    //clientfd可读的回调函数
 int send_cb(int fd);    //clientfd可写时的回调函数
 
-
-//用于将clientfd添加进epfd，flag为1时为新添加fd，flag为0时为更改fd
+// 封装 epoll_ctl：统一处理“新增监听”与“修改监听事件”
 int set_event(int fd,int event,int flag) {
     if (flag) {                                             //为1时
         //定义了一个epoll_event结构体ev，用于描述要监听的事件
@@ -71,7 +67,7 @@ int set_event(int fd,int event,int flag) {
 }
 
 int accept_cb(int fd) {
-    //为accept返回的clientfd准备地址结构体用于被accept填满
+    // 为 accept 返回的 clientfd 准备地址结构体
     struct sockaddr_in clientaddr;
     socklen_t len = sizeof(clientaddr);
 
@@ -84,6 +80,7 @@ int accept_cb(int fd) {
     printf("accept finished,using the number %d clientfd\n",clientfd);
 
     conn_list[clientfd].fd=clientfd;
+    // 新连接建立后，后续读事件由 recv_cb 负责处理
     conn_list[clientfd].r_action.recv_callback=recv_cb;
     conn_list[clientfd].send_callback=send_cb;
 
@@ -110,7 +107,7 @@ int recv_cb(int fd) {
         memset(&conn_list[fd],0,sizeof(conn_list[fd]));
         return -1;
     }
-    //如果客户端断开连接
+    // 客户端主动断开时回收 fd 和对应连接状态
     if (count==0) {
         printf("client disconnect,won't use the number %d clientfd\n",fd);
         //将第connfd号clientfd关掉
@@ -137,6 +134,7 @@ int recv_cb(int fd) {
     kvs_request(&conn_list[fd]);
 #endif
 
+    // 业务处理完成后切到写事件，把响应发回客户端
     set_event(fd,EPOLLOUT,0);
 
     return count;
@@ -179,7 +177,7 @@ int send_cb(int fd) {
     return 0;
 }
 
-//用于初始化sockfd，并且开始监听，返回sockfd的值
+// 创建并初始化监听 socket，供 reactor 主循环注册到 epoll 中
 static int init_server(const unsigned short port) {
     //创建用于监听的sockfd
     int sockfd=socket(AF_INET,SOCK_STREAM,0);
@@ -218,7 +216,7 @@ int reactor_start(unsigned short port, msg_handler handler) {
         set_event(sockfd,EPOLLIN,1);
     }
 
-    //主循环
+    // reactor 主循环：等待事件，再按事件类型分发到对应回调
     while (1) {
         struct epoll_event events [1024]={0};
         int nready=epoll_wait(epfd,events,1024,-1);
@@ -230,9 +228,9 @@ int reactor_start(unsigned short port, msg_handler handler) {
         int i=0;
         for (i=0;i<nready;i++) {
             int connfd=events[i].data.fd;
-            //EPOLLIN和EPOLLOUT是位标志(bit flags)，而不是普通的数值，所以可以同时存在，即可读又可写
+            // EPOLLIN / EPOLLOUT 是位标志，可能同时出现在同一个事件上
             if (events[i].events&EPOLLIN) {
-                //联合体共享内存，如果此fd为clientfd，则调用recv_callback就是调用accept_callback
+                // 监听 socket 这里实际会走 accept_callback，普通连接会走 recv_callback
                 conn_list[connfd].r_action.recv_callback(connfd);
             }
             if (events[i].events&EPOLLOUT) {

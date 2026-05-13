@@ -2,19 +2,19 @@
 #define __KV_STORE_H__
 
 
-//网络层
+// 网络层实现切换：同一套协议层/存储层，按宏选择底层收发模型
 #define NETWORK_REACTOR 	0
 #define NETWORK_PROACTOR	1
 #define NETWORK_NTYCO		2
 
-#define NETWORK_SELECT		NETWORK_NTYCO
+#define NETWORK_SELECT		NETWORK_REACTOR
 
 
-//协议层
+// 协议层一次请求最多拆分出的 token 数量
 #define KVS_MAX_TOKENS		128
 
 
-//数据引擎层
+// 数据引擎开关：当前阶段通过编译期开关切到不同后端
 #define ENABLE_ARRAY		0
 #define ENABLE_HASH			1
 #define ENABLE_RBTREE		0
@@ -38,7 +38,7 @@
 //消息处理函数（业务函数），传入message和length  返回response
 typedef int (*msg_handler)(char *msg, int length, char *response);
 
-//给主程序提供 3 种“启动服务器”的入口(相当于#include reactor.h/proactor.h/ntyco.h)
+// 给主程序提供 3 种“启动服务器”的统一入口
 extern int reactor_start    (unsigned short port, msg_handler handler);
 extern int proactor_start   (unsigned short port, msg_handler handler);
 extern int ntyco_start      (unsigned short port, msg_handler handler);
@@ -54,7 +54,7 @@ void  kvs_free(void *ptr);
 
 
 
-
+// 存储引擎统一操作表：协议层只认这组接口，不关心底层具体实现
 typedef struct kvs_ops_s {
 	int   (*create)(void* engine);
 	void  (*destroy)(void* engine);
@@ -66,6 +66,7 @@ typedef struct kvs_ops_s {
 	int   (*exist)(void* engine, char* key);
 } kvs_ops_t;
 
+// 当前被选中的引擎实例 + 对应操作表
 typedef struct kvs_engine_s {
 	void* engine;
 	kvs_ops_t ops;

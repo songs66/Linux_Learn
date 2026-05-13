@@ -10,7 +10,7 @@
 
 kvs_hash_t global_hash;
 
-//简易哈希函数
+// 简易哈希函数：先把 key 的每个字节求和，再映射到桶下标
 static int _hash(const char *key, int size) {
 	if (!key || size<=0) return -1;
 
@@ -25,7 +25,7 @@ static int _hash(const char *key, int size) {
 	return (int)(sum % (unsigned int)size);
 }
 
-//在哈希表里创建一个新的键值对节点
+// 为拉链法桶创建一个新的链表节点
 hashnode_t *_create_node(char *key, char *value) {
 
 	hashnode_t *node = (hashnode_t*)kvs_malloc(sizeof(hashnode_t));
@@ -64,7 +64,7 @@ hashnode_t *_create_node(char *key, char *value) {
 }
 
 
-//创建表
+// 初始化哈希表：分配桶数组，并把每个桶头置空
 int kvs_hash_create(void* engine) {
 	kvs_hash_t *hash = (kvs_hash_t*)engine;
 
@@ -80,7 +80,7 @@ int kvs_hash_create(void* engine) {
 	return 0;
 }
 
-//删除表
+// 销毁整张哈希表：逐桶遍历，把链表节点和键值内存全部释放
 void kvs_hash_destroy(void* engine) {
 	kvs_hash_t *hash = (kvs_hash_t*)engine;
 
@@ -104,7 +104,7 @@ void kvs_hash_destroy(void* engine) {
 	kvs_free(hash->nodes);
 }
 
-
+// HSET：先定位桶，再在桶对应的链表里查重并头插新节点
 int kvs_hash_set(void* engine, char *key, char *value) {
 	kvs_hash_t *hash = (kvs_hash_t*)engine;
 
@@ -130,7 +130,7 @@ int kvs_hash_set(void* engine, char *key, char *value) {
 	return 0;
 }
 
-
+// HGET：先算桶下标，再只在对应桶的链表里查找
 char * kvs_hash_get(void* engine, char *key) {
 	kvs_hash_t *hash = (kvs_hash_t*)engine;
 
@@ -151,7 +151,7 @@ char * kvs_hash_get(void* engine, char *key) {
 	return NULL;
 }
 
-
+// HMOD：命中节点后直接替换 value，桶结构本身不变
 int kvs_hash_mod(void* engine, char *key, char *value) {
 	kvs_hash_t *hash = (kvs_hash_t*)engine;
 
@@ -192,7 +192,7 @@ int kvs_hash_count(void* engine) {
 	return hash->count;
 }
 
-
+// HDEL：在命中的桶里摘掉目标节点，并维护链表前后关系
 int kvs_hash_del(void* engine, char *key) {
 	kvs_hash_t *hash = (kvs_hash_t*)engine;
 
@@ -242,7 +242,7 @@ int kvs_hash_del(void* engine, char *key) {
 	return 0;
 }
 
-
+// HEXIST 复用 HGET 的查找结果，避免重复写一套遍历逻辑
 int kvs_hash_exist(void* engine,char *key) {
 	kvs_hash_t *hash = (kvs_hash_t*)engine;
 
