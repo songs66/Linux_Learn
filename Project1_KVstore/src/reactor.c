@@ -77,6 +77,11 @@ int accept_cb(int fd) {
         printf("accept error:%s\n",strerror(errno));
         return -1;
     }
+    if (clientfd >= CONNECTION_SIZE) {
+        printf("clientfd %d exceeds conn_list capacity\n", clientfd);
+        close(clientfd);
+        return -1;
+    }
     printf("accept finished,using the number %d clientfd\n",clientfd);
 
     conn_list[clientfd].fd=clientfd;

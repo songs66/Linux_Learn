@@ -65,17 +65,31 @@ void server_acceptor(void *arg) {
 
 	if(-1 == bind(sockfd, (struct sockaddr*)&local, sizeof(struct sockaddr_in))) {
         perror("bind:");
+        close(sockfd);
+        return;
     }
-	listen(sockfd, 10);
+	if (-1 == listen(sockfd, 10)) {
+        perror("listen:");
+        close(sockfd);
+        return;
+    }
 	printf("listen finished,using the number %d sockfd\n",sockfd);
 
     while(1) {
         // 协程库会把阻塞式 accept 包装成可调度的挂起/恢复流程
         socklen_t len = sizeof(struct sockaddr_in);
         int cli_fd = accept(sockfd, (struct sockaddr*)&remote, &len);
+        if (cli_fd < 0) {
+            perror("accept:");
+            continue;
+        }
 
         // 为每个协程单独分配一份 fd，避免传递局部变量地址
         int *fd_ptr = malloc(sizeof(int));
+        if (fd_ptr == NULL) {
+            close(cli_fd);
+            continue;
+        }
         *fd_ptr = cli_fd;
 
         // 为每个客户端连接创建一个 reader 协程，让每个连接各自顺序处理请求

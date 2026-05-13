@@ -72,20 +72,4 @@ typedef struct kvs_engine_s {
 	kvs_ops_t ops;
 }kvs_engine_t;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #endif

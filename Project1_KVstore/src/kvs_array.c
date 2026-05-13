@@ -71,7 +71,10 @@ int kvs_array_set(void *engine, char *key, char *value) {
 	strncpy(kcopy, key, strlen(key));
 
 	char *kvalue = kvs_malloc(strlen(value) + 1);
-	if (kvalue == NULL) return -2;
+	if (kvalue == NULL) {
+		kvs_free(kcopy);
+		return -2;
+	}
 	memset(kvalue, 0, strlen(value) + 1);
 	strncpy(kvalue, value, strlen(value));
 

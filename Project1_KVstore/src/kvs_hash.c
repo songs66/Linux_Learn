@@ -122,6 +122,7 @@ int kvs_hash_set(void* engine, char *key, char *value) {
 	}
 
 	hashnode_t *new_node = _create_node(key, value);
+	if (new_node == NULL) return -2;
 	new_node->next = hash->nodes[idx];
 	hash->nodes[idx] = new_node;
 	

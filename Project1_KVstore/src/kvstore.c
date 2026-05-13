@@ -62,13 +62,13 @@ int kvs_split_token(char *msg, char *tokens[]) {
 	if (msg == NULL || tokens == NULL) return -1;
 
 	int idx = 0;
-	char *token = strtok(msg, " ");
+	// 同时把空格、回车、换行和制表符都当成分隔符，避免尾部 token 带脏字符
+	char *token = strtok(msg, " \r\n\t");
 	
 	while (token != NULL) {
-		//printf("idx: %d, %s\n", idx, token);
 		
 		tokens[idx ++] = token;
-		token = strtok(NULL, " ");
+		token = strtok(NULL, " \r\n\t");
 	}
 
 	return idx;
@@ -95,6 +95,10 @@ int kvs_filter_protocol(char **tokens, int count, char *response) {
 	switch(cmd) {
 
 	case KVS_CMD_SET:
+		if (count != 3 || key == NULL || value == NULL) {
+			length = sprintf(response, "ERROR\r\n");
+			break;
+		}
 		ret = g_engine.ops.set(g_engine.engine ,key, value);
 		if (ret < 0) {
 			length = sprintf(response, "ERROR\r\n");
@@ -106,6 +110,10 @@ int kvs_filter_protocol(char **tokens, int count, char *response) {
 		
 		break;
 	case KVS_CMD_GET: {
+		if (count != 2 || key == NULL) {
+			length = sprintf(response, "ERROR\r\n");
+			break;
+		}
 		char *result = g_engine.ops.get(g_engine.engine, key);
 		if (result == NULL) {
 			length = sprintf(response, "NO EXIST\r\n");
@@ -115,6 +123,10 @@ int kvs_filter_protocol(char **tokens, int count, char *response) {
 		break;
 	}
 	case KVS_CMD_DEL:
+		if (count != 2 || key == NULL) {
+			length = sprintf(response, "ERROR\r\n");
+			break;
+		}
 		ret = g_engine.ops.del(g_engine.engine ,key);
 		if (ret < 0) {
 			length = sprintf(response, "ERROR\r\n");
@@ -125,6 +137,10 @@ int kvs_filter_protocol(char **tokens, int count, char *response) {
 		}
 		break;
 	case KVS_CMD_MOD:
+		if (count != 3 || key == NULL || value == NULL) {
+			length = sprintf(response, "ERROR\r\n");
+			break;
+		}
 		ret = g_engine.ops.mod(g_engine.engine ,key, value);
 		if (ret < 0) {
 			length = sprintf(response, "ERROR\r\n");
@@ -135,6 +151,10 @@ int kvs_filter_protocol(char **tokens, int count, char *response) {
 		}
 		break;
 	case KVS_CMD_EXIST:
+		if (count != 2 || key == NULL) {
+			length = sprintf(response, "ERROR\r\n");
+			break;
+		}
 		ret = g_engine.ops.exist(g_engine.engine ,key);
 		if (ret == 0) {
 			length = sprintf(response, "EXIST\r\n");

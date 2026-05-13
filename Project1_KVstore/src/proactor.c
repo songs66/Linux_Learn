@@ -180,8 +180,22 @@ int proactor_start(unsigned short port, msg_handler handler) {
             switch (event->type)
             {
             case EVENT_ACCEPT:
+                if (entries->res < 0) {
+                    printf("accept error:%s\n", strerror(-entries->res));
+                    len = sizeof(clientaddr);
+                    set_event_accept(&ring, sockfd, (struct sockaddr*)&clientaddr, &len, 0);
+                    free(event);
+                    break;
+                }
                 // 为新连接创建一份独立的收发上下文
                 io_conn_t *conn = malloc(sizeof(struct io_conn_s));
+                if (conn == NULL) {
+                    close(entries->res);
+                    len = sizeof(clientaddr);
+                    set_event_accept(&ring, sockfd, (struct sockaddr*)&clientaddr, &len, 0);
+                    free(event);
+                    break;
+                }
                 memset(conn,0,sizeof(struct io_conn_s));
                 // 把新连接上下文挂到这次 accept 事件上
                 event->conn=conn;
@@ -194,8 +208,10 @@ int proactor_start(unsigned short port, msg_handler handler) {
                 set_event_recv(&ring,event->conn,0);
                 printf("set_event_recv success!\n");
                 // 再补一个 accept，保证后续客户端还能继续接入
+                len = sizeof(clientaddr);
                 set_event_accept(&ring,sockfd,(struct sockaddr*)&clientaddr,&len,0);
                 printf("set_event_accept success!\n");
+                free(event);
                 break;
 
             case EVENT_RECV:
@@ -204,6 +220,12 @@ int proactor_start(unsigned short port, msg_handler handler) {
                 if(event->conn->rlen == 0) {
                     // recv 返回 0 说明客户端主动断开连接
                     printf("client disconnect,won't use the number %d clientfd\n",event->conn->fd);
+                    close(event->conn->fd);
+                    free(event->conn);
+                    free(event);
+                    break;
+                } else if (event->conn->rlen < 0) {
+                    printf("recv error:%s\n", strerror(-event->conn->rlen));
                     close(event->conn->fd);
                     free(event->conn);
                     free(event);
@@ -220,19 +242,31 @@ int proactor_start(unsigned short port, msg_handler handler) {
                     // 提交一次 send，把协议层生成的响应发回去
                     set_event_send(&ring,event->conn,0);
                     printf("set_event_send success!\n");
+                    free(event);
                     break;
                 }
+                free(event);
+                break;
 
             case EVENT_SEND:
                 // send 的返回值就是本次实际发出的字节数
                 int send_ret = entries->res;
+                if (send_ret < 0) {
+                    printf("send error:%s\n", strerror(-send_ret));
+                    close(event->conn->fd);
+                    free(event->conn);
+                    free(event);
+                    break;
+                }
                 printf("successful send %d bytes to clientfd:%d\nSEND:%s\n",send_ret,event->conn->fd,event->conn->wbuf);
 
                 // 当前请求处理完毕后，继续为该连接提交下一次 recv
                 set_event_recv(&ring,event->conn,0);
                 printf("set_event_recv success!\n");
+                free(event);
                 break;
             default:
+                free(event);
                 return -1;
             }
         }
